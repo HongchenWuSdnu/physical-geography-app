@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>自然资源敏感分级合规平台（静态表单演示）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <style>
+    body { font-family: "Segoe UI", Arial, sans-serif; background: #f8fafc; margin: 0; }
+    header { background: #fff; border-bottom: 1px solid #e6e9ee; }
+    .nav { display: flex; align-items: center; max-width: 1260px; margin: 0 auto; padding: 0 24px;}
+    .nav-logo { font-weight: bold; color: #165ba6; font-size: 1.16em; margin-right: 28px; display:flex;align-items:center;}
+    .nav-logo img { height: 22px; margin-right: 8px;}
+    .nav-tabs { display: flex; flex: 1;}
+    .nav-tabs a {
+      display: block; color: #165ba6; text-decoration: none; padding: 22px 20px 13px 20px; font-size: 1.08em;
+      border-bottom: 3px solid transparent; transition: .17s; margin-right: 2px; font-weight: 500;
+    }
+    .nav-tabs a.active, .nav-tabs a:hover { border-bottom: 3px solid #f44336; background: #f7f9fa; color: #f44336;}
+    .container { max-width: 1100px; margin: 36px auto 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #0001; padding: 34px 34px 24px 34px; min-height:500px;}
+    .tab-content { display: none;}
+    .tab-content.active { display: block;}
+    .section-title { font-size: 1.33em; font-weight: 600; color: #165ba6; margin: 1.1em 0 0.5em; }
+    .form-block { background: #f4f6fa; border-radius: 8px; padding: 1.2em 1.3em; margin-bottom: 1.3em;}
+    .form-block label { display: block; font-weight: 500; margin: 12px 0 7px 0;}
+    .form-block input, .form-block select, .form-block textarea {
+      width: 100%; padding: 9px 12px; border-radius: 6px; border: 1px solid #d2dbe5; font-size: 1em; margin-bottom: 9px; box-sizing:border-box;
+    }
+    .form-block input[type="file"] { background: #fff; border: none;}
+    .form-block input[type="range"] { width: calc(100% - 48px);}
+    .form-block button {
+      background: #165ba6; color: #fff; border: none; border-radius: 7px; font-size: 1.08em;
+      padding: 10px 32px; cursor: pointer; margin-top: 6px; font-weight: 500; transition: .15s;
+    }
+    .form-block button:hover { background: #f44336;}
+    .matrix-table, .simple-table { width: 100%; border-collapse: collapse; margin-top: 1.5em;}
+    .matrix-table th, .matrix-table td, .simple-table th, .simple-table td {
+      border: 1px solid #dde2ea; padding: 8px 9px; text-align: center;
+    }
+    .matrix-table th, .simple-table th { background: #f2f6fa;}
+    .matrix-table .forbid { background: #ffeaea; color: #d32f2f; font-weight: bold;}
+    .matrix-table .allow { background: #e7fbe9; color: #09740a; font-weight: bold;}
+    .footer {color:#7d8697;font-size:0.98em;text-align:center;margin:2em 0 1.5em 0;}
+    @media (max-width: 750px) {.container{padding:10px;}}
+  </style>
+</head>
+<body>
+<header>
+  <nav class="nav">
+    <div class="nav-logo">
+      <img src="https://cdn-icons-png.flaticon.com/512/3429/3429626.png" height="20" alt="logo">
+      自然资源敏感分级合规平台
+    </div>
+    <div class="nav-tabs">
+      <a href="#home" class="active" onclick="showTab(event,'home')">平台首页</a>
+      <a href="#judge" onclick="showTab(event,'judge')">分级判定/自动脱敏</a>
+      <a href="#blur" onclick="showTab(event,'blur')">高斯模糊脱敏</a>
+      <a href="#jitter" onclick="showTab(event,'jitter')">坐标扰动脱敏</a>
+      <a href="#ledger" onclick="showTab(event,'ledger')">台账与销毁登记</a>
+      <a href="#ontology" onclick="showTab(event,'ontology')">术语本体/参数API</a>
+      <a href="#standard" onclick="showTab(event,'standard')">标准映射/国标对齐</a>
+      <a href="#blockchain" onclick="showTab(event,'blockchain')">区块链存证</a>
+    </div>
+  </nav>
+</header>
+<div class="container">
+
+  <!-- 首页 -->
+  <div class="tab-content active" id="home">
+    <div class="section-title">平台简介</div>
+    <ul>
+      <li>本平台集成自然资源敏感数据分级判定、脱敏处理、台账登记、术语标准、区块链存证等核心功能。</li>
+      <li>支持遥感影像、矢量坐标、台账登记等多种类型数据的合规安全管理。</li>
+      <li>所有页面为静态演示，无需后端服务，适合展示和汇报。</li>
+    </ul>
+  </div>
+
+  <!-- 分级判定/自动脱敏 -->
+  <div class="tab-content" id="judge">
+    <div class="section-title">一键分级判定与自动脱敏处理</div>
+    <div class="form-block">
+      <label>上传遥感影像 (jpg/png)：</label>
+      <input type="file" disabled placeholder="Drag and drop file here">
+      <label>空间分辨率(m)：</label>
+      <select disabled>
+        <option>0.3</option><option>1</option><option>5</option><option>10</option><option>30</option>
+      </select>
+      <label>敏感等级(1-5)：</label>
+      <select disabled>
+        <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+      </select>
+      <button disabled>一键判定与脱敏</button>
+    </div>
+    <div style="font-weight:500;margin-top:1.5em;">分级判定矩阵</div>
+    <table class="matrix-table">
+      <tr>
+        <th>分辨率\\等级</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
+      </tr>
+      <tr>
+        <td>0.3</td><td>&lt;NA&gt;</td><td>&lt;NA&gt;</td><td class="allow">可控流通</td><td class="forbid">禁止流通</td><td class="forbid">禁止流通</td>
+      </tr>
+      <tr>
+        <td>1</td><td>&lt;NA&gt;</td><td>&lt;NA&gt;</td><td class="allow">可控流通</td><td class="forbid">禁止流通</td><td class="forbid">禁止流通</td>
+      </tr>
+      <tr>
+        <td>5</td><td class="allow">可控流通</td><td>&lt;NA&gt;</td><td>&lt;NA&gt;</td><td>&lt;NA&gt;</td><td class="forbid">禁止流通</td>
+      </tr>
+    </table>
+    <div style="color:#d32f2f;font-size:0.96em;margin-top:6px;">红色为禁止流通，绿色为可控流通</div>
+  </div>
+
+  <!-- 高斯模糊脱敏 -->
+  <div class="tab-content" id="blur">
+    <div class="section-title">遥感影像高斯模糊脱敏演示</div>
+    <div class="form-block">
+      <label>上传遥感影像 (jpg/png)：</label>
+      <input type="file" disabled>
+      <label>模糊半径(px)：</label>
+      <input type="range" min="3" max="25" value="8" disabled>
+      <span style="margin-left:12px;">8</span>
+      <button disabled>执行高斯模糊脱敏</button>
+    </div>
+  </div>
+
+  <!-- 坐标扰动脱敏 -->
+  <div class="tab-content" id="jitter">
+    <div class="section-title">空间点/线CSV坐标扰动脱敏</div>
+    <div class="form-block">
+      <label>上传空间点/线CSV：</label>
+      <input type="file" disabled>
+      <label>扰动幅度(米)：</label>
+      <input type="range" min="1" max="200" value="10" disabled>
+      <span style="margin-left:12px;">10</span>
+      <button disabled>执行坐标扰动脱敏</button>
+    </div>
+    <div style="margin-top:1.5em; color:#7d8697;">
+      上传含有 <b>lon,lat</b> 字段的CSV文件，设置扰动幅度，系统自动生成脱敏版。<br>
+      （本页面为静态演示，实际功能需Python后端或其它服务支持）
+    </div>
+  </div>
+
+  <!-- 台账与销毁登记 -->
+  <div class="tab-content" id="ledger">
+    <div class="section-title">合规台账与销毁登记</div>
+    <div class="form-block">
+      <label>待销毁数据名称：</label>
+      <input type="text" disabled>
+      <label>责任人：</label>
+      <input type="text" disabled>
+      <label>上传销毁截图（可选）：</label>
+      <input type="file" disabled>
+      <button disabled>登记销毁</button>
+    </div>
+    <div style="margin-top:1.4em;color:#7d8697;">暂无台账记录。</div>
+  </div>
+
+  <!-- 术语本体/参数API -->
+  <div class="tab-content" id="ontology">
+    <div class="section-title">术语本体结构与参数API</div>
+    <table class="simple-table">
+      <tr><th>分辨率(m)</th><th>敏感等级</th><th>判定</th><th>高斯半径(px)</th><th>坐标扰动(m)</th></tr>
+      <tr><td>0.3</td><td>5</td><td>禁止流通</td><td>15</td><td>100</td></tr>
+      <tr><td>0.3</td><td>4</td><td>禁止流通</td><td>12</td><td>80</td></tr>
+      <tr><td>0.3</td><td>3</td><td>可控流通</td><td>10</td><td>60</td></tr>
+    </table>
+    <div class="form-block" style="margin-top:1.2em;">
+      <label>输入敏感关键词：</label>
+      <input type="text" disabled>
+      <button disabled>查询标签及脱敏参数</button>
+    </div>
+    <div style="font-size:1.02em; margin-top:1.3em;">
+      <b>本体哈希摘要：</b><br>
+      b22b26d3fab87959aac4bb1277fb974654f100d0d42b99abd97d36c4b3924285
+    </div>
+  </div>
+
+  <!-- 标准映射/国标对齐 -->
+  <div class="tab-content" id="standard">
+    <div class="section-title">敏感关键词-国标等级映射</div>
+    <table class="simple-table">
+      <tr><th>敏感关键词</th><th>国标等级</th><th>说明</th></tr>
+      <tr><td>战略指挥工程</td><td>A</td><td>…</td></tr>
+      <tr><td>密集居民区</td><td>B</td><td>…</td></tr>
+    </table>
+    <div class="form-block" style="margin-top:1.3em;">
+      <label>输入关键词查国标等级：</label>
+      <input type="text" disabled>
+      <button disabled>查找国标等级</button>
+    </div>
+  </div>
+
+  <!-- 区块链存证 -->
+  <div class="tab-content" id="blockchain">
+    <div class="section-title">区块链存证与安全链路</div>
+    <div class="form-block">
+      <label>模拟存证内容：</label>
+      <input type="text" disabled placeholder="输入要存证的内容">
+      <button disabled>生成区块链编号</button>
+    </div>
+    <div style="margin-top:1.4em;color:#7d8697;">
+      支持销毁存证哈希编号上链、区块链编号归档，并可集成国密SM4/SM9端到端加密保障跨境数据安全。
+    </div>
+  </div>
+
+</div>
+<div class="footer">
+  © 2025 自然资源敏感数据合规平台 | 静态演示 Powered by GitHub Pages
+</div>
+<script>
+  function showTab(evt, tab) {
+    var tabs = document.getElementsByClassName("tab-content");
+    for (var i=0; i<tabs.length; i++) tabs[i].classList.remove("active");
+    document.getElementById(tab).classList.add("active");
+    var links = document.querySelectorAll(".nav-tabs a");
+    for (var i=0;i<links.length;i++) links[i].classList.remove("active");
+    evt.currentTarget.classList.add("active");
+    window.scrollTo(0, 0);
+  }
+  // URL hash 支持
+  if(window.location.hash){
+    var tab = window.location.hash.replace('#','');
+    if(document.getElementById(tab)){
+      document.querySelectorAll(".nav-tabs a").forEach(l=>l.classList.remove("active"));
+      document.querySelector('.nav-tabs a[href="#'+tab+'"]').classList.add("active");
+      document.querySelectorAll(".tab-content").forEach(t=>t.classList.remove("active"));
+      document.getElementById(tab).classList.add("active");
+    }
+  }
+</script>
+</body>
+</html>
