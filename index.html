@@ -277,7 +277,7 @@
 
 </div>
 
-<div class="footer">© 2025 自然资源敏感数据合规平台 | 前端演示，无需后端</div>
+<div class="footer">© 2025 自然资源敏感数据合规平台 </div>
 
 <script>
 /* ========= 标签页切换 ========= */
@@ -306,7 +306,8 @@ function updatePermit(){
   const c = getSelVal('selCountry');
   const u = getSelInt('selAuth');
   const ok = permit(u,c);
-  document.getElementById('permitBadge').textContent = `Permit: ${u? '已认证':'未认证'} / ${c||'-'} → ${ok? '允许':'拒绝'}`;
+  document.getElementById('permitBadge').textContent =
+    `Permit: ${u? '已认证':'未认证'} / ${c||'-'} → ${ok? '允许':'拒绝'}`;
   document.getElementById('btnDownloadBlur').disabled = !ok;
 }
 updatePermit();
@@ -315,7 +316,7 @@ updatePermit();
 const CONFIG = {
   ontology:{version:'v1.4.3', items:['geo:sen/001','geo:sen/005','geo:sen/008']},
   rules:[
-    {cond:'入库', action:'受控', level:'G', priority:1, enabled:true},
+    {cond:'入库',     action:'受控', level:'G', priority:1, enabled:true},
     {cond:'跨域共享', action:'受审计', level:'I', priority:1, enabled:true},
     {cond:'存储期满', action:'归档', level:'C', priority:1, enabled:true}
   ]
@@ -329,51 +330,63 @@ let CONFIG_HASH_EXPECT = '';
   document.getElementById('verText').textContent = CONFIG.ontology.version;
   document.getElementById('verHash').textContent = h.slice(0,16)+'…';
   const ok = (h===CONFIG_HASH_EXPECT);
-  document.getElementById('verStatus').innerHTML = ok ? '<span class="ok">版本校验通过</span>' : '<span class="err">版本不一致，已禁止执行</span>';
+  document.getElementById('verStatus').innerHTML =
+    ok ? '<span class="ok">版本校验通过</span>' : '<span class="err">版本不一致，已禁止执行</span>';
   renderRuleTable();
 })();
 
 let RULE_ENGINE_ON = false;
-function toggleRuleEngine(on){ RULE_ENGINE_ON = !!on; document.getElementById('ruleState').textContent = RULE_ENGINE_ON ? '已启用' : '未启用'; }
-
+function toggleRuleEngine(on){
+  RULE_ENGINE_ON = !!on;
+  document.getElementById('ruleState').textContent = RULE_ENGINE_ON ? '已启用' : '未启用';
+}
 function renderRuleTable(){
   const tb = document.querySelector('#ruleTable tbody');
   tb.innerHTML='';
   CONFIG.rules.forEach((r,i)=>{
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${r.cond}</td><td>${r.action}</td><td>${r.level}</td><td>${r.priority}</td><td>${r.enabled? '是':'否'}</td>`;
+    tr.innerHTML =
+      `<td>${i+1}</td><td>${r.cond}</td><td>${r.action}</td><td>${r.level}</td><td>${r.priority}</td><td>${r.enabled? '是':'否'}</td>`;
     tb.appendChild(tr);
   });
 }
 
 /* ========= 分级判定 ========= */
 function doJudge(){
-  if(!RULE_ENGINE_ON){ alert('请先在“规则库/版本校验”中启用规则引擎'); return; }
+  if(!RULE_ENGINE_ON){
+    alert('请先在“规则库/版本校验”中启用规则引擎');
+    return;
+  }
   const rsel = getSelVal('resSel'), ssel = getSelInt('sensSel');
   const Rs = resLevel(rsel);
-  const R = Rs*ssel;
-  const T = parseInt(document.getElementById('thresh').value,10)||9;
+  const R  = Rs*ssel;
+  const T  = parseInt(document.getElementById('thresh').value,10)||9;
   const pass = (R<T);
-  const txt = pass? '可控流通' : '禁止流通';
+  const txt  = pass? '可控流通' : '禁止流通';
   document.getElementById('judgeOut').textContent = `R=${R} (T=${T}) → ${txt}`;
 }
 
 /* ========= 高斯卷积 ========= */
-const blurCanvas = document.getElementById('blurCanvas'), bctx = blurCanvas.getContext('2d');
 let blurImg = null;
+const blurCanvas = document.getElementById('blurCanvas'), bctx = blurCanvas.getContext('2d');
+
 document.getElementById('blurImg').addEventListener('change', e=>{
   const f = e.target.files[0]; if(!f) return;
   const url = URL.createObjectURL(f); const img = new Image();
   img.onload = ()=>{ blurImg = img; drawImageFit(); applyGaussian(); URL.revokeObjectURL(url); };
   img.src = url;
 });
+
 function drawImageFit(){
   bctx.clearRect(0,0,blurCanvas.width,blurCanvas.height);
   if(!blurImg) return;
   const sw=blurImg.width, sh=blurImg.height, cw=blurCanvas.width, ch=blurCanvas.height;
-  const sc=Math.min(cw/sw, ch/sh), dw=Math.floor(sw*sc), dh=Math.floor(sh*sc), dx=Math.floor((cw-dw)/2), dy=Math.floor((ch-dh)/2);
+  const sc=Math.min(cw/sw, ch/sh);
+  const dw=Math.floor(sw*sc), dh=Math.floor(sh*sc);
+  const dx=Math.floor((cw-dw)/2), dy=Math.floor((ch-dh)/2);
   bctx.drawImage(blurImg, dx, dy, dw, dh);
 }
+
 function gaussianKernel(rb){
   const sigma = Math.max(0.1, rb/3);
   const r = Math.max(0, Math.floor(rb));
@@ -389,17 +402,20 @@ function gaussianKernel(rb){
   for(let i=0;i<k.length;i++) k[i]/=sum;
   return {k, r};
 }
+
 function applyGaussian(){
   const rb = parseInt(document.getElementById('blurR').value,10);
   const ok = permit(getSelInt('selAuth'), getSelVal('selCountry'));
   document.getElementById('btnDownloadBlur').disabled = !ok;
   if(!blurImg){ return; }
+
   drawImageFit();
   const imgData = bctx.getImageData(0,0,blurCanvas.width, blurCanvas.height);
   const src = imgData.data;
   const out = new Uint8ClampedArray(src.length);
   const {k, r} = gaussianKernel(rb);
   const w = blurCanvas.width, h = blurCanvas.height;
+
   for(let y=0;y<h;y++){
     for(let x=0;x<w;x++){
       let rsum=0,gsum=0,bsum=0,asum=0, idxK=0;
@@ -416,12 +432,13 @@ function applyGaussian(){
         }
       }
       const o = (y*w+x)*4;
-      out[o] = rsum; out[o+1]=gsum; out[o+2]=bsum; out[o+3]=asum;
+      out[o]=rsum; out[o+1]=gsum; out[o+2]=bsum; out[o+3]=asum;
     }
   }
   for(let i=0;i<src.length;i++) src[i]=out[i];
   bctx.putImageData(imgData,0,0);
 }
+
 function downloadCanvas(canvasId, filename){
   const c = document.getElementById(canvasId);
   const url = c.toDataURL('image/png');
@@ -439,17 +456,18 @@ function parseCSV(text){
   const rows = lines.slice(1).map(l=>l.split(','));
   return {head,lonIdx,latIdx,rows};
 }
-function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;}}
+function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
 function seedToInt(s){let h=0;for(let i=0;i<s.length;i++){h=(h*131 + s.charCodeAt(i))>>>0;}return h||0x9e3779b9;}
-function metersToDeg(lat,meters){const dLat = meters/111320; const dLon = meters/(111320*Math.cos(lat*Math.PI/180)); return {dLat,dLon};}
+function metersToDeg(lat,meters){
+  const dLat = meters/111320;
+  const dLon = meters/(111320*Math.cos(lat*Math.PI/180));
+  return {dLat,dLon};
+}
 
 async function doJitter() {
   try {
     const file = document.getElementById('csvFile').files[0];
-    if (!file) {
-      alert('请选择 CSV 文件');
-      return;
-    }
+    if (!file) { alert('请选择 CSV 文件'); return; }
 
     const c = getSelVal('selCountry');
     const u = getSelInt('selAuth');
@@ -471,19 +489,16 @@ async function doJitter() {
     }
     const { head, lonIdx, latIdx, rows } = parsed;
 
-    const basis = seedInput || (file.name + rows.length);
+    const basis   = seedInput || (file.name + rows.length);
     const seedHex = await sha256Hex(basis);
-    const rng = mulberry32(seedToInt(seedHex.slice(0, 8)));
+    const rng     = mulberry32(seedToInt(seedHex.slice(0, 8)));
 
     const out = [head.join(',')];
 
     rows.forEach(cols => {
       const lon = parseFloat(cols[lonIdx]);
       const lat = parseFloat(cols[latIdx]);
-      if (isNaN(lon) || isNaN(lat)) {
-        out.push(cols.join(','));
-        return;
-      }
+      if (isNaN(lon) || isNaN(lat)) { out.push(cols.join(',')); return; }
 
       const { dLat, dLon } = metersToDeg(lat, Rm);
       const r = rng();
@@ -497,7 +512,7 @@ async function doJitter() {
       out.push(cc.join(','));
     });
 
-    const csvText = '\uFEFF' + out.join('\n'); // 加 BOM，Excel 更易识别 UTF-8
+    const csvText = '\uFEFF' + out.join('\n');
     const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -513,7 +528,7 @@ async function doJitter() {
 const CAL = [];
 function addCalendarTask(){
   const name = document.getElementById('calName').value.trim();
-  const d = document.getElementById('calDate').value;
+  const d    = document.getElementById('calDate').value;
   if(!name||!d){ alert('请填写名称与到期日'); return; }
   CAL.push({name, due:new Date(d+'T00:00:00Z'), state:'监控中'});
   renderCalendar();
@@ -533,13 +548,13 @@ function renderCalendar(){
   tb.innerHTML='';
   CAL.forEach((r,i)=>{
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${r.name}</td><td>${r.due.toISOString().slice(0,10)}</td><td>${r.state}</td>`;
+    tr.innerHTML =
+      `<td>${i+1}</td><td>${r.name}</td><td>${r.due.toISOString().slice(0,10)}</td><td>${r.state}</td>`;
     tb.appendChild(tr);
   });
 }
 async function scanCalendar(){
   const now = new Date();
-
   for(const r of CAL){
     const ms   = r.due - now;
     const days = Math.floor(ms/(1000*3600*24));
@@ -550,14 +565,12 @@ async function scanCalendar(){
       alert(`[提醒-7天] ${r.name}`);
       continue;
     }
-
     if(days <= 1 && (r.state === '监控中' || r.state === '已提醒(7天)')){
       r.state = '已提醒(1天)';
       await addLedger('remind1', r.name);
       alert(`[提醒-1天] ${r.name}`);
       continue;
     }
-
     if(days <= 0 && r.state !== '到期处理'){
       r.state = '到期处理';
       await addLedger('due', r.name);
@@ -565,7 +578,6 @@ async function scanCalendar(){
       continue;
     }
   }
-
   renderCalendar();
 }
 
@@ -585,65 +597,41 @@ async function addLedger(type = 'manual', obj = '') {
   const currFull  = await sha256Hex(prev + payload);
   const currShort = currFull.slice(0, 10);
 
-  arr.push({
-    type,
-    name,
-    owner,
-    t,
-    prev: prev || '-',
-    curr: currShort
-  });
-
+  arr.push({ type, name, owner, t, prev: prev || '-', curr: currShort });
   setLedger(arr);
 }
-
 function renderLedger(){
   const tb = document.querySelector('#ledgerTable tbody');
   tb.innerHTML='';
   getLedger().forEach((r,i)=>{
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td>${r.name}</td><td>${r.owner}</td><td>${r.t.replace('T',' ').replace('Z','')}</td><td>${r.prev||'-'}</td><td>${r.curr}</td>`;
+    tr.innerHTML =
+      `<td>${i+1}</td><td>${r.name}</td><td>${r.owner}</td><td>${r.t.replace('T',' ').replace('Z','')}</td><td>${r.prev||'-'}</td><td>${r.curr}</td>`;
     tb.appendChild(tr);
   });
   document.getElementById('ledgerTip').textContent = `记录数：${getLedger().length}`;
 }
-
 async function verifyLedger() {
   const arr = getLedger();
-  if (!arr.length) {
-    alert('当前台账为空，无需校验。');
-    return;
-  }
+  if (!arr.length) { alert('当前台账为空，无需校验。'); return; }
 
   let prev = '';
-
   for (const r of arr) {
     const type = r.type || 'manual';
     const rec  = `${type}|${r.name}|${r.owner}|${r.t}`;
     const curr = (await sha256Hex(prev + rec)).slice(0, 10);
-
     if (curr !== r.curr) {
       alert('校验失败：发现断链/篡改');
       return;
     }
-
     prev = r.curr;
   }
-
   alert('校验通过：台账链完整');
 }
-
 function clearLedger(){ if(confirm('清空台账？')) setLedger([]); }
 renderLedger();
 
 /* ========= 标准映射（自然资源场景规则） ========= */
-/**
- * 规则设计（面向自然地理资源）：
- * - 绝密：国家级能源基地、战略油气田、稀有金属矿、饮用水一类水源地、生态红线核心区等；
- * - 机密：大中型水库、水电站、一般油气田/煤矿、重要湿地、基本农田保护区等；
- * - 内部：土地利用现状、一般基础地理、普查、示例/教学数据、公开数据等。
- * 打分：score = 0.3*语义 + 0.3*密级 + 0.4*关键词匹配
- */
 const LEVEL_CONFIG = [
   {
     level: '绝密',
@@ -675,19 +663,12 @@ const LEVEL_CONFIG = [
     ]
   }
 ];
-
-// 让“关键词匹配”权重更高
 const WEIGHT = { semantic: 0.3, secrecy: 0.3, kw: 0.4 };
 
 function kwMatchScore(input, list){
   if(!input) return 0.2;
   let hit = 0;
-  for(const k of list){
-    if(input.includes(k)){
-      hit = 1.0;
-      break;
-    }
-  }
+  for(const k of list){ if(input.includes(k)){ hit = 1.0; break; } }
   return hit || 0.2;
 }
 
@@ -701,25 +682,18 @@ function runMapping(){
     const sSemantic = cfg.baseSemantic;
     const sSecrecy  = cfg.baseSecrecy;
     const sKw       = kwMatchScore(kw, cfg.keywords);
-    const score     = WEIGHT.semantic*sSemantic + WEIGHT.secrecy*sSecrecy + WEIGHT.kw*sKw;
+    const score = WEIGHT.semantic*sSemantic + WEIGHT.secrecy*sSecrecy + WEIGHT.kw*sKw;
 
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${cfg.level}</td>
-                    <td>${sSemantic.toFixed(2)}</td>
-                    <td>${sSecrecy.toFixed(2)}</td>
-                    <td>${sKw.toFixed(2)}</td>
-                    <td>${score.toFixed(2)}</td>`;
+    tr.innerHTML =
+      `<td>${cfg.level}</td><td>${sSemantic.toFixed(2)}</td><td>${sSecrecy.toFixed(2)}</td><td>${sKw.toFixed(2)}</td><td>${score.toFixed(2)}</td>`;
     tb.appendChild(tr);
 
-    if(!best || score > best.score){
-      best = { level: cfg.level, score };
-    }
+    if(!best || score > best.score){ best = { level: cfg.level, score }; }
   });
 
-  // ★ 特殊规则：凡是包含“土地利用”的，一律优先归为“内部” ★
-  if (kw && kw.includes('土地利用')) {
-    best = { level: '内部', score: 0.95 };
-  }
+  // 特殊：包含“土地利用”优先判为内部
+  if (kw && kw.includes('土地利用')) { best = { level:'内部', score:0.95 }; }
 
   if(!kw){
     document.getElementById('mapOut').textContent =
@@ -736,6 +710,24 @@ async function doHash(){
   if(!v) return;
   document.getElementById('bcHash').value = await sha256Hex(v);
 }
+
+/* ========= 根据 URL 的 hash 自动激活对应 tab（支持二维码直达） ========= */
+function activateTabByHash() {
+  const hash = window.location.hash || '#home';
+  const map = {
+    '#home':'home','#rules':'rules','#judge':'judge','#blur':'blur',
+    '#jitter':'jitter','#calendar':'calendar','#ledger':'ledger',
+    '#standard':'standard','#blockchain':'blockchain'
+  };
+  const id = map[hash];
+  if (!id) return;
+  const link = document.querySelector(`.nav-tabs a[href="${hash}"]`);
+  if (link) {
+    showTab({ currentTarget: link }, id);
+  }
+}
+window.addEventListener('DOMContentLoaded', activateTabByHash);
+window.addEventListener('hashchange', activateTabByHash);
 </script>
 </body>
 </html>
