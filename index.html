@@ -277,7 +277,7 @@
 
 </div>
 
-<div class="footer">© 2025 自然资源敏感数据合规平台 </div>
+<div class="footer">© 2025 自然资源敏感数据合规平台 | 前端演示，无需后端</div>
 
 <script>
 /* ========= 标签页切换 ========= */
@@ -359,8 +359,8 @@ function doJudge(){
 }
 
 /* ========= 高斯卷积 ========= */
-let blurImg = null;
 const blurCanvas = document.getElementById('blurCanvas'), bctx = blurCanvas.getContext('2d');
+let blurImg = null;
 document.getElementById('blurImg').addEventListener('change', e=>{
   const f = e.target.files[0]; if(!f) return;
   const url = URL.createObjectURL(f); const img = new Image();
@@ -387,21 +387,19 @@ function gaussianKernel(rb){
     }
   }
   for(let i=0;i<k.length;i++) k[i]/=sum;
-  return {k, r, size};
+  return {k, r};
 }
 function applyGaussian(){
   const rb = parseInt(document.getElementById('blurR').value,10);
   const ok = permit(getSelInt('selAuth'), getSelVal('selCountry'));
   document.getElementById('btnDownloadBlur').disabled = !ok;
   if(!blurImg){ return; }
-  // 取当前画布像素
   drawImageFit();
   const imgData = bctx.getImageData(0,0,blurCanvas.width, blurCanvas.height);
   const src = imgData.data;
   const out = new Uint8ClampedArray(src.length);
-  const {k, r, size} = gaussianKernel(rb);
+  const {k, r} = gaussianKernel(rb);
   const w = blurCanvas.width, h = blurCanvas.height;
-  // 卷积
   for(let y=0;y<h;y++){
     for(let x=0;x<w;x++){
       let rsum=0,gsum=0,bsum=0,asum=0, idxK=0;
@@ -423,6 +421,12 @@ function applyGaussian(){
   }
   for(let i=0;i<src.length;i++) src[i]=out[i];
   bctx.putImageData(imgData,0,0);
+}
+function downloadCanvas(canvasId, filename){
+  const c = document.getElementById(canvasId);
+  const url = c.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
 }
 
 /* ========= CSV 坐标扰动 ========= */
